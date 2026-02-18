@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  unit:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,9 +22,28 @@ jobs:
       - name: Run tests
         run: go test ./...
 
-  docker_build:
+  guardrail:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker image
-        run: docker build -t secrets-guard:ci .
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+
+      - name: Secrets-Guard (added lines only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.sha }}"
+          else
+            BASE_SHA="$(git rev-parse HEAD~1)"
+            HEAD_SHA="$(git rev-parse HEAD)"
+          fi
+          echo "BASE_SHA=${BASE_SHA}"
+          echo "HEAD_SHA=${HEAD_SHA}"
+          git diff --unified=0 "${BASE_SHA}" "${HEAD_SHA}" | go run ./cmd/guardrail scan --stdin
