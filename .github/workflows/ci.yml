@@ -22,8 +22,7 @@ jobs:
       - name: Run tests
         run: go test ./...
 
-  guard:
-    name: secrets-guard (added-lines gate)
+  beta_added_lines_block:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
@@ -31,8 +30,5 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Secrets-Guard (local action)
+      - name: Run Secrets-Guard Action (local repo)
         uses: ./
-        env:
-          GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
