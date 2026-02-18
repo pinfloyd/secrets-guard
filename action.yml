@@ -1,0 +1,11 @@
+name: "secrets-guard"
+description: "Deterministic CI hard-block for real secrets in added diff lines (zero config, zero telemetry)."
+author: "guardrail-dev"
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+
+branding:
+  icon: "shield"
+  color: "red"
