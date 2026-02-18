@@ -1,9 +1,8 @@
-# SG_SAFE_DIRECTORY_BEGIN
-# Fix Git "dubious ownership" inside container (CVE-2022-24765 hardening)
-git config --global --add safe.directory /github/workspace || true
-# SG_SAFE_DIRECTORY_END
 #!/bin/sh
 set -eu
+
+# Fix Git "dubious ownership" inside container (CVE-2022-24765 hardening)
+git config --global --add safe.directory /github/workspace || true
 
 # --- Deterministic workspace guard ---
 WS="${GITHUB_WORKSPACE:-/github/workspace}"
