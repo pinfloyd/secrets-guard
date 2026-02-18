@@ -1,0 +1,32 @@
+secrets-guard — reference state
+Generated: 2026-02-18T15:46:42
+
+LOCAL_HEAD = 55fab685810f94786e88ee17fabb2a82180d8ae2
+LOCAL_TAG_v0.1.0 = 55fab685810f94786e88ee17fabb2a82180d8ae2
+REMOTE_origin_main = 55fab685810f94786e88ee17fabb2a82180d8ae2
+GITHUB_main_sha = 55fab685810f94786e88ee17fabb2a82180d8ae2
+
+GO_VERSION = go version go1.22.5 windows/amd64
+
+DOCKER_IMAGES_MATCHING_secrets-guard:
+secrets-guard:local sha256:54f431d4c5d475a6f895c72cb64cd576211d60a928543bc3e95ac373862f33d0
+
+FILES_IN_HEAD (18):
+.github/workflows/ci.yml
+.gitignore
+Dockerfile
+LICENSE
+README.md
+action.yml
+cmd/guardrail/main.go
+entrypoint.sh
+go.mod
+internal/detector/scan.go
+internal/detector/scan_test.go
+internal/detector/types.go
+internal/diff/parse.go
+internal/model/types.go
+internal/rules/entropy.go
+internal/rules/mask.go
+internal/rules/rules.go
+internal/rules/rules_test.go
