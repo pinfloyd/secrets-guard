@@ -5,12 +5,15 @@ set -eu
 # GITHUB_EVENT_NAME
 # GITHUB_BASE_SHA (optional)
 # GITHUB_SHA
+# GITHUB_WORKSPACE (typically /github/workspace)
 
-# Fallback logic:
-# 1) If GITHUB_BASE_SHA present → diff BASE..HEAD
-# 2) Else if event is pull_request and BASE_REF available → try merge-base
-# 3) Else → diff HEAD~1..HEAD
-# If diff cannot be computed → exit 3
+# Always run inside the checked-out repo mount.
+WS="${GITHUB_WORKSPACE:-/github/workspace}"
+if [ ! -d "$WS" ]; then
+  echo "ERROR: workspace dir not found: $WS"
+  exit 3
+fi
+cd "$WS"
 
 HEAD_SHA="${GITHUB_SHA:-}"
 BASE_SHA="${GITHUB_BASE_SHA:-}"
@@ -45,8 +48,4 @@ if ! DIFF_OUTPUT="$(sh -c "$DIFF_CMD")"; then
   exit 3
 fi
 
-# Pipe to guardrail
-echo "$DIFF_OUTPUT" | guardrail scan --stdin
-EXIT_CODE=$?
-
-exit $EXIT_CODE
+echo "$DIFF_OUTPUT" | /usr/local/bin/guardrail
