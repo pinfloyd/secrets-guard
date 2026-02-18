@@ -9,27 +9,6 @@ permissions:
   packages: read
 
 jobs:
-  diff-gate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Run Secrets-Guard
-        run: |
-          docker pull ghcr.io/pinfloyd/secrets-guard:v0.1.0
-          BASE=${{ github.event.pull_request.base.sha }}
-          HEAD=${{ github.sha }}
-          if [ -z "$BASE" ]; then
-            BASE=$(git rev-parse HEAD~1)
-          fi
-          docker run --rm \
-            -e GITHUB_BASE_SHA=$BASE \
-            -e GITHUB_SHA=$HEAD \
-            -v $PWD:/work \
-            ghcr.io/pinfloyd/secrets-guard:v0.1.0
-
   test:
     runs-on: ubuntu-latest
     steps:
@@ -41,5 +20,48 @@ jobs:
         with:
           go-version: "1.22.x"
 
-      - name: Run tests
+      - name: Go tests
         run: go test ./...
+
+      - name: GHCR login (read-only)
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: secrets-guard smoke (added-lines must BLOCK)
+        shell: bash
+        run: |
+          set -euo pipefail
+          TS="$(date -u +%Y%m%d_%H%M%S)"
+          WORK="$(mktemp -d)"
+          cd "$WORK"
+          git init -q
+          git config user.email "ci@local"
+          git config user.name  "ci"
+          printf "hello=world\n" > app.env
+          git add -A
+          git commit -m "base" -q
+          BASE="$(git rev-parse HEAD)"
+
+          printf "AWS_ACCESS_KEY_ID=AKIA1234567890ABCDEF\nhello=world\n" > app.env
+          git add -A
+          git commit -m "head" -q
+          HEAD="$(git rev-parse HEAD)"
+
+          echo "BASE=$BASE"
+          echo "HEAD=$HEAD"
+
+          docker pull ghcr.io/pinfloyd/secrets-guard:v0.1.0
+          set +e
+          docker run --rm \
+            -e "GITHUB_BASE_SHA=$BASE" \
+            -e "GITHUB_SHA=$HEAD" \
+            -v "$WORK:/work" \
+            ghcr.io/pinfloyd/secrets-guard:v0.1.0
+          CODE=$?
+          set -e
+
+          echo "EXIT_CODE=$CODE"
+          if [ "$CODE" -ne 2 ]; then
+            echo "EXPECTED_EXIT_2_BLOCKED_BUT_GOT=$CODE"
+            exit 1
+          fi
+          echo "SMOKE_OK=true"
