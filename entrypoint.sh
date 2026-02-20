@@ -12,12 +12,17 @@ if [ ! -d ".git" ]; then
 fi
 
 if [ "${GITHUB_EVENT_NAME:-}" = "pull_request" ]; then
-  BASE_SHA="$(jq -r .pull_request.base.sha "$GITHUB_EVENT_PATH")"
-  HEAD_SHA="$(jq -r .pull_request.head.sha "$GITHUB_EVENT_PATH")"
+  BASE="${GITHUB_BASE_REF:-master}"
 
   git fetch --prune origin "+refs/heads/*:refs/remotes/origin/*" || true
 
-  DIFF="$(git diff --unified=0 "$BASE_SHA" "$HEAD_SHA" || true)"
+  if ! git show-ref --verify --quiet "refs/remotes/origin/$BASE"; then
+    BASE="main"
+  fi
+
+  BASE_SHA="$(git merge-base HEAD origin/$BASE || true)"
+
+  DIFF="$(git diff --unified=0 "$BASE_SHA" HEAD || true)"
 else
   DIFF="$(git diff --unified=0 HEAD~1 HEAD || true)"
 fi
