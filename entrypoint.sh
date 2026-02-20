@@ -1,26 +1,31 @@
 #!/bin/sh
 set -eu
 
-# Fix Git "dubious ownership" inside container (CVE-2022-24765 hardening)
 git config --global --add safe.directory /github/workspace || true
 
-# --- Deterministic workspace guard ---
 WS="${GITHUB_WORKSPACE:-/github/workspace}"
-
-if [ -d "$WS" ]; then
-  cd "$WS"
-fi
+cd "$WS"
 
 if [ ! -d ".git" ]; then
   echo "ERROR: not inside a git repository (pwd=$(pwd))" >&2
   exit 3
 fi
-# --- End guard ---
 
-# Compute diff (PR vs push compatible)
+# -----------------------------
+# Robust diff logic
+# -----------------------------
 if [ "${GITHUB_EVENT_NAME:-}" = "pull_request" ]; then
-  git fetch origin "${GITHUB_BASE_REF}" --depth=1
-  DIFF="$(git diff --unified=0 "origin/${GITHUB_BASE_REF}"...HEAD)"
+  BASE="${GITHUB_BASE_REF:-master}"
+
+  # Fetch full history for correct merge-base
+  git fetch --prune origin "+refs/heads/*:refs/remotes/origin/*" || true
+
+  # Fallback if branch doesn't exist
+  if ! git show-ref --verify --quiet "refs/remotes/origin/$BASE"; then
+    BASE="main"
+  fi
+
+  DIFF="$(git diff --unified=0 "origin/$BASE"...HEAD || true)"
 else
   DIFF="$(git diff --unified=0 HEAD~1 HEAD || true)"
 fi
