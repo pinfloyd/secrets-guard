@@ -1,61 +1,66 @@
-# secrets-guard
+# Secrets-Guard
 
-Deterministic, zero-config, zero-telemetry CI gate that blocks newly added secrets in pull request and push diffs.
+Hard-fail secret detection for pull requests.
 
-## What it does
+Secrets-Guard blocks sensitive credentials before they reach your main branch.
+No SaaS. No telemetry. No external scanning.
+Runs entirely inside your GitHub Actions pipeline.
 
-- Scans only added lines in unified diff
-- Blocks merge if a real secret is detected
+---
+
+## What It Does
+
+- Scans only added lines in pull requests
+- Detects high-risk credentials (AWS, OpenAI, tokens, private keys)
+- Fails CI immediately on violation
+- Deterministic rule engine
+- Zero external network calls
+
+If a secret is detected, the merge is blocked.
+
+---
+
+## 60-Second Setup
+
+Add this to your GitHub workflow:
+
+name: Secrets Guard
+on:
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pinfloyd/secrets-guard@v1
+
+---
+
+## Example Failure
+
+OPENAI_API_KEY = "sk-XXXXXXXXXXXXXXXXXXXX"
+
+SECRETS-GUARD: VIOLATION DETECTED
+Rule: OPENAI_API_KEY_PATTERN
+Status: HARD FAIL
+
+Merge blocked.
+
+---
+
+## Design Principles
+
+- Deterministic execution
+- Diff-only scanning
 - No telemetry
-- No outbound network calls
-- No configuration
-- Deterministic output
+- No cloud dependency
+- No silent bypass
 
-Exit codes:
-- 0 = clean
-- 2 = secret detected (blocked)
-- 3 = configuration/runtime error
+If the rule matches — the build fails.
 
-## Usage (GitHub Action)
+---
 
-    name: secrets-guard
+## License
 
-    on:
-      pull_request:
-      push:
-
-    permissions:
-      contents: read
-
-    jobs:
-      guard:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
-            with:
-              fetch-depth: 0
-
-          - name: Run secrets-guard
-            uses: guardrail-dev/secrets-guard@v1
-            env:
-              GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-
-### Notes
-
-- For pull_request events, pass:
-  GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-
-- For push events, the action falls back to:
-  HEAD~1..HEAD
-
-- If diff cannot be computed, the action fails with exit code 3.
-
-## Security model
-
-- Diff-only scanning (no historical scan)
-- No suppressions
-- No allow-lists
-- No remote config
-- Immutable rule set
-
-This is intentionally opinionated.
+See LICENSE file.
