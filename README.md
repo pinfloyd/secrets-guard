@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pinfloyd/secrets-guard@v1
+      - uses: pinfloyd/secrets-guard@v2.1.0
 
 ---
 
