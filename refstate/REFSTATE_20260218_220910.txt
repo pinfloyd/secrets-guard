@@ -1,0 +1,31 @@
+Secrets-Guard — Reference State (facts)
+Generated: 2026-02-18T22:09:10
+RepoRoot: H:/secrets-guard
+Branch: main
+HEAD: 8c4193f2b4ae3b59d7029aa59cfaddace84bc4a9
+Remote:
+origin	https://github.com/pinfloyd/secrets-guard.git (fetch)
+origin	https://github.com/pinfloyd/secrets-guard.git (push)
+
+Tree inventories:
+TREE_ALL_FILES_FILE: H:\secrets-guard\out\TREE_ALL_FILES_20260218_220910.txt
+TREE_ALL_FILES_SHA256: e4f6515dd310e5ac2cc845a04e47e075ed7edc96aa6649b20494a9f41e7839eb
+TREE_GIT_TRACKED_FILE: H:\secrets-guard\out\TREE_GIT_TRACKED_20260218_220910.txt
+TREE_GIT_TRACKED_SHA256: da9faf94fd3323b582c283e3983f1018ce16a983ad9e2fd62d7e5c6c97375242
+
+Key file SHA-256:
+action.yml: db0b55b250b366c07b9495245540c15167dc06c7ce31010675cf166c38013114
+entrypoint.sh: f057e0b1a120fe3e7be76554fd374148443cfae235a0ac570858cd39b8672060
+.github/workflows/ci.yml: f4397b19248cfbc9bf793797350fb7fe1df9cce8794ae62aca86901047d74a89
+.github/workflows/beta.yml: cadd5e5b3ed30abd09b55c0d58fc9b05d553751a19ef8c32331eeecb6e8ae0a0
+cmd/guardrail/main.go: 3fc1cdc7c0264a8169eb2f74c56808ccd9dfacf276fd31040ac283b2a045dd69
+go.mod: c19b2150c9d35bd28c9671dd1e972879ed9b9578aeb50cf0164576068593ed8c
+go.sum: MISSING
+Dockerfile: acf798534190c20ca2ff8fce77a68d6a40cc2bd2454e44d4a4d5946c4b0a94ba
+README.md: 5dcada05cf830f1cfadd9a8ddc02ab2127b9299a9694a86b17f26fd62083e1ad
+
+Enforcement validation (evidence-linked):
+PR_ENFORCEMENT_RUN_ID: 22152590725
+PR_ENFORCEMENT_RUN_TITLE: beta: entropy multi-findings (Rule5 x2)
+PR_ENFORCEMENT_RUN_CREATED_AT: 02/18/2026 18:33:34
+PR_ENFORCEMENT_EVIDENCE: log contains 'BLOCKED:' and 'findings_count:2'

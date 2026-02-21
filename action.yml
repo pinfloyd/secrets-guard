@@ -1,11 +1,33 @@
-name: "secrets-guard"
-description: "Deterministic CI hard-block for real secrets in added diff lines (zero config, zero telemetry)."
-author: "guardrail-dev"
-
+name: Secrets-Guard
+description: Hard-fail secret detection for pull requests
 runs:
-  using: "docker"
-  image: "Dockerfile"
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        set -e
+        echo "EVENT: $GITHUB_EVENT_NAME"
 
-branding:
-  icon: "shield"
-  color: "red"
+        if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          git fetch --no-tags origin "$BASE_SHA"
+          DIFF_RANGE="$BASE_SHA $HEAD_SHA"
+        else
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            DIFF_RANGE="HEAD~1 HEAD"
+          else
+            DIFF_RANGE="HEAD"
+          fi
+        fi
+
+        echo "DIFF_RANGE: $DIFF_RANGE"
+
+        git diff $DIFF_RANGE > /tmp/diff.txt || true
+
+        if grep -E "sk-[A-Za-z0-9]{20,}" /tmp/diff.txt >/dev/null; then
+          echo "SECRETS-GUARD: VIOLATION DETECTED"
+          exit 1
+        fi
+
+        echo "SECRETS-GUARD: OK"
