@@ -39,7 +39,13 @@ mkdir -p "$TMP_DIR"
 DIFF_FILE="$TMP_DIR/diff.txt"
 
 # Create unified diff between base and head
+echo "DIFF_RANGE: ${BASE_SHA} ${HEAD_SHA}"
+echo "DIFF_FILE: ${DIFF_FILE}"
 git diff "$BASE_SHA" "$HEAD_SHA" > "$DIFF_FILE" || true
+echo "DIFF_BYTES: $( (wc -c < "$DIFF_FILE" 2>/dev/null) || echo 0 )"
+echo "=== DIFF DEBUG START ==="
+( sed -n '1,200p' "$DIFF_FILE" 2>/dev/null ) || true
+echo "=== DIFF DEBUG END ==="
 
 DIFF_BYTES="$(wc -c < "$DIFF_FILE" | tr -d ' ')"
 echo "DIFF_FILE=$DIFF_FILE"
