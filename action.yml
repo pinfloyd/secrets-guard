@@ -1,32 +1,67 @@
 name: Secrets-Guard
-description: Hard-fail secret detection for pull requests
+description: Hard-fail secret detection for pull requests (diff-only, added lines)
 runs:
   using: "composite"
   steps:
     - shell: bash
       run: |
-        set -e
+        set -euo pipefail
         echo "EVENT: $GITHUB_EVENT_NAME"
+        echo "GITHUB_SHA: ${GITHUB_SHA:-}"
 
-        if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+        # Resolve base/head SHAs deterministically by event type
+        if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
           BASE_SHA="${{ github.event.pull_request.base.sha }}"
           HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-          git fetch --no-tags origin "$BASE_SHA"
-          DIFF_RANGE="$BASE_SHA $HEAD_SHA"
+          echo "PR_BASE_SHA: ${BASE_SHA}"
+          echo "PR_HEAD_SHA: ${HEAD_SHA}"
+          # Ensure BASE_SHA exists locally for diff
+          git fetch --no-tags --prune --depth=50 origin "${BASE_SHA}" >/dev/null 2>&1 || true
+          RANGE="${BASE_SHA}..${HEAD_SHA}"
+        elif [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+          # Prefer before..after if available
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+          echo "PUSH_BEFORE: ${BEFORE}"
+          echo "PUSH_AFTER:  ${AFTER}"
+          git fetch --no-tags --prune --depth=50 origin "${BEFORE}" >/dev/null 2>&1 || true
+          RANGE="${BEFORE}..${AFTER}"
         else
+          # Manual runs: diff HEAD~1..HEAD if possible, otherwise scan nothing deterministically
           if git rev-parse HEAD~1 >/dev/null 2>&1; then
-            DIFF_RANGE="HEAD~1 HEAD"
+            RANGE="HEAD~1..HEAD"
           else
-            DIFF_RANGE="HEAD"
+            RANGE=""
           fi
+          echo "MANUAL_RANGE: ${RANGE}"
         fi
 
-        echo "DIFF_RANGE: $DIFF_RANGE"
+        if [ -z "${RANGE}" ]; then
+          echo "DIFF_RANGE: (empty) -> OK"
+          echo "SECRETS-GUARD: OK"
+          exit 0
+        fi
 
-        git diff $DIFF_RANGE > /tmp/diff.txt || true
+        echo "DIFF_RANGE: ${RANGE}"
 
-        if grep -E "sk-[A-Za-z0-9]{20,}" /tmp/diff.txt >/dev/null; then
+        # Create a unified=0 diff (minimal), then extract only added lines (ignore +++ file headers)
+        git diff --unified=0 "${RANGE}" > /tmp/sg_diff.txt || true
+
+        echo "DIFF_BYTES: $(wc -c < /tmp/sg_diff.txt | tr -d ' ')"
+        echo "DIFF_LINES: $(wc -l < /tmp/sg_diff.txt | tr -d ' ')"
+
+        # Added lines only
+        grep -E '^\+' /tmp/sg_diff.txt | grep -Ev '^\+\+\+' | sed 's/^\+//' > /tmp/sg_added.txt || true
+
+        echo "ADDED_LINES: $(wc -l < /tmp/sg_added.txt | tr -d ' ')"
+        echo "ADDED_PREVIEW_FIRST_30:"
+        head -n 30 /tmp/sg_added.txt || true
+
+        # Minimal high-signal rule for demo: sk- token
+        if grep -E "sk-[A-Za-z0-9]{20,}" /tmp/sg_added.txt >/dev/null 2>&1; then
           echo "SECRETS-GUARD: VIOLATION DETECTED"
+          echo "Rule: GENERIC_SK_TOKEN_PATTERN"
+          echo "Status: HARD FAIL"
           exit 1
         fi
 
