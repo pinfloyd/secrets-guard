@@ -1,0 +1,23 @@
+name: secrets-guard-enterprise-client-only-demo
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+
+jobs:
+  sg-client-only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Call remote Authority (template)
+        env:
+          AUTHORITY_URL: "http://107.172.34.21:8787"
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Template workflow: build intent from added lines and POST to \/admit"

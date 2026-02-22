@@ -1,0 +1,147 @@
+**********************
+PowerShell transcript start
+Start time: 20260222101845
+Username: DESKTOP-KEEAJSB\Floyd
+RunAs User: DESKTOP-KEEAJSB\Floyd
+Configuration Name: 
+Machine: DESKTOP-KEEAJSB (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll
+Process ID: 30264
+PSVersion: 7.5.4
+PSEdition: Core
+GitCommitId: 7.5.4
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS C:\Users\Floyd> "=== CLIENT-ONLY FREEZE v0.1 ==="
+=== CLIENT-ONLY FREEZE v0.1 ===
+PS C:\Users\Floyd> "UTC_NOW=" + (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+UTC_NOW=2026-02-22T08:18:45Z
+PS C:\Users\Floyd> "ROOT=" + $ROOT
+ROOT=H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only
+PS C:\Users\Floyd> function Sha256([string]$p){ (Get-FileHash -Algorithm SHA256 -Path $p).Hash.ToLower() }
+PS C:\Users\Floyd> ""
+
+PS C:\Users\Floyd> "=== KEY HASHES (facts) ==="
+=== KEY HASHES (facts) ===
+PS C:\Users\Floyd> "VERIFY_EXE_SHA256=" + (Sha256 $verifyExe)
+VERIFY_EXE_SHA256=5a7eab12a1981668de44faf3c5fb5d4a171c18103dbd4680bf4c478e290a802b
+PS C:\Users\Floyd> "PUBKEY_JSON_SHA256=" + (Sha256 $pubkeyJson)
+PUBKEY_JSON_SHA256=09dc5b360c87431d44a4b75f7ad746bd6700bba953e8cce9368b8d0a0a4ca672
+PS C:\Users\Floyd> "SAMPLE_INTENT_SHA256=" + (Sha256 $intentJson)
+SAMPLE_INTENT_SHA256=473e761faa1a5941b706bfdc3f1b98d0d99a88aff276cb8a9d5553292bfddabb
+PS C:\Users\Floyd> "SAMPLE_RECORD_SHA256=" + (Sha256 $recordJson)
+SAMPLE_RECORD_SHA256=9a567a4449779254fdf34b080e04a4e0d327f4bd5985e58ce47320ededbd0952
+PS C:\Users\Floyd> "VERIFY_OUTPUT_SHA256=" + (Sha256 $verifyOut)
+VERIFY_OUTPUT_SHA256=cbe8cc41a262916093b489087be3e57cf9776c98fd2fc5b9de213e68f11a1bd4
+PS C:\Users\Floyd> ""
+
+PS C:\Users\Floyd> "=== VERIFY_OUTPUT_TAIL (facts) ==="
+=== VERIFY_OUTPUT_TAIL (facts) ===
+PS C:\Users\Floyd> Get-Content -Path $verifyOut -Tail 60
+VERIFICATION_OK
+PS C:\Users\Floyd> # ---- manifest rebuild (authoritative for freeze) ----
+PS C:\Users\Floyd> ""
+
+PS C:\Users\Floyd> "=== REBUILD MANIFEST ==="
+=== REBUILD MANIFEST ===
+PS C:\Users\Floyd> $manifest = Join-Path $OUT "CLIENT_ONLY_MANIFEST_SHA256.txt"
+PS C:\Users\Floyd> $files = Get-ChildItem -Recurse -File $ROOT |
+  Where-Object { $_.FullName -notlike "$OUT\*" } |
+  Sort-Object FullName
+PS C:\Users\Floyd> $lines = New-Object System.Collections.Generic.List[string]
+PS C:\Users\Floyd> foreach($f in $files){
+  $h = (Get-FileHash -Algorithm SHA256 -Path $f.FullName).Hash.ToLower()
+  $rel = $f.FullName.Substring($ROOT.Length).TrimStart("\")
+  $lines.Add("$h  $rel")
+}
+PS C:\Users\Floyd> $body = ($lines -join "`n") + "`n"
+PS C:\Users\Floyd> Set-Content -Encoding ASCII -NoNewline -Path $manifest -Value $body
+PS C:\Users\Floyd> $manifestSha = Sha256 $manifest
+PS C:\Users\Floyd> $manifestSide = $manifest + ".sha256"
+PS C:\Users\Floyd> Set-Content -Encoding ASCII -NoNewline -Path $manifestSide -Value ("$manifestSha  " + (Split-Path -Leaf $manifest) + "`n")
+PS C:\Users\Floyd> "MANIFEST_FILE=$manifest"
+MANIFEST_FILE=H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\CLIENT_ONLY_MANIFEST_SHA256.txt
+PS C:\Users\Floyd> "MANIFEST_SHA256=$manifestSha"
+MANIFEST_SHA256=0b039ffee12320005b0d94a03240d5dfc332c39acfbd5596bc43b34ead886b46
+PS C:\Users\Floyd> # ---- global hash list (includes OUT, for full freeze set) ----
+PS C:\Users\Floyd> ""
+
+PS C:\Users\Floyd> "=== BUILD GLOBAL SHA256SUMS (full tree) ==="
+=== BUILD GLOBAL SHA256SUMS (full tree) ===
+PS C:\Users\Floyd> $global = Join-Path $OUT "GLOBAL_SHA256SUMS_CLIENT_ONLY.txt"
+PS C:\Users\Floyd> $all = Get-ChildItem -Recurse -File $ROOT | Sort-Object FullName
+PS C:\Users\Floyd> $g = ""
+PS C:\Users\Floyd> foreach($f in $all){
+  $h = (Get-FileHash -Algorithm SHA256 -Path $f.FullName).Hash.ToLower()
+  $rel = $f.FullName.Substring($ROOT.Length).TrimStart("\")
+  $g += "$h  $rel`n"
+}
+PS C:\Users\Floyd> TerminatingError(Get-FileHash): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: The process cannot access the file 'H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\PROOF_CLIENT_ONLY_FREEZE_TRANSCRIPT_20260222_081845.txt' because it is being used by another process."
+>> TerminatingError(Get-FileHash): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: The process cannot access the file 'H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\PROOF_CLIENT_ONLY_FREEZE_TRANSCRIPT_20260222_081845.txt' because it is being used by another process."
+The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: The process cannot access the file 'H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\PROOF_CLIENT_ONLY_FREEZE_TRANSCRIPT_20260222_081845.txt' because it is being used by another process.
+Get-FileHash: 
+Line |
+   2 |    $h = (Get-FileHash -Algorithm SHA256 -Path $f.FullName).Hash.ToLowe …
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | The process cannot access the file 'H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\PROOF_CLIENT_ONLY_FREEZE_TRANSCRIPT_20260222_081845.txt' because it is being used by another process.
+PS C:\Users\Floyd> Set-Content -Encoding ASCII -NoNewline -Path $global -Value $g
+PS C:\Users\Floyd> $globalSha = Sha256 $global
+PS C:\Users\Floyd> $globalSide = $global + ".sha256"
+PS C:\Users\Floyd> Set-Content -Encoding ASCII -NoNewline -Path $globalSide -Value ("$globalSha  " + (Split-Path -Leaf $global) + "`n")
+PS C:\Users\Floyd> "GLOBAL_FILE=$global"
+GLOBAL_FILE=H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\GLOBAL_SHA256SUMS_CLIENT_ONLY.txt
+PS C:\Users\Floyd> "GLOBAL_SHA256SUMS_SHA256=$globalSha"
+GLOBAL_SHA256SUMS_SHA256=523a06f84a9ffc16b141970cd55b6958de1ab595f805919d18e7a2cdc308b643
+PS C:\Users\Floyd> # ---- deterministic ZIP builder (fixed file order + fixed entry timestamps) ----
+PS C:\Users\Floyd> ""
+
+PS C:\Users\Floyd> "=== BUILD DETERMINISTIC ZIP ==="
+=== BUILD DETERMINISTIC ZIP ===
+PS C:\Users\Floyd> Add-Type -AssemblyName System.IO.Compression
+PS C:\Users\Floyd> Add-Type -AssemblyName System.IO.Compression.FileSystem
+PS C:\Users\Floyd> $zip = Join-Path $OUT ("SG_ENTERPRISE_CLIENT_ONLY_v0.1_FROZEN_" + $ts + ".zip")
+PS C:\Users\Floyd> if(Test-Path $zip){ Remove-Item -Force $zip }
+PS C:\Users\Floyd> $fixedTime = [DateTimeOffset]::Parse("2000-01-01T00:00:00Z")
+PS C:\Users\Floyd> $fs = [System.IO.File]::Open($zip, [System.IO.FileMode]::CreateNew)
+PS C:\Users\Floyd> try {
+  $za = New-Object System.IO.Compression.ZipArchive($fs, [System.IO.Compression.ZipArchiveMode]::Create, $true)
+  try {
+    # Include everything under ROOT, including OUT proofs/manifests (full frozen package)
+    $zipFiles = Get-ChildItem -Recurse -File $ROOT | Sort-Object FullName
+    foreach($f in $zipFiles){
+      $rel = $f.FullName.Substring($ROOT.Length).TrimStart("\").Replace("\","/")
+      $entry = $za.CreateEntry($rel, [System.IO.Compression.CompressionLevel]::Optimal)
+      $entry.LastWriteTime = $fixedTime
+      $in  = [System.IO.File]::OpenRead($f.FullName)
+      try {
+        $out = $entry.Open()
+        try { $in.CopyTo($out) } finally { $out.Dispose() }
+      } finally { $in.Dispose() }
+    }
+  } finally { $za.Dispose() }
+} finally { $fs.Dispose() }
+PS C:\Users\Floyd> TerminatingError(): "Exception calling "OpenRead" with "1" argument(s): "The process cannot access the file 'H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\PROOF_CLIENT_ONLY_FREEZE_TRANSCRIPT_20260222_081845.txt' because it is being used by another process.""
+Exception calling "OpenRead" with "1" argument(s): "The process cannot access the file 'H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\PROOF_CLIENT_ONLY_FREEZE_TRANSCRIPT_20260222_081845.txt' because it is being used by another process."
+ParentContainsErrorRecordException: 
+Line |
+  10 |        $in  = [System.IO.File]::OpenRead($f.FullName)
+     |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Exception calling "OpenRead" with "1" argument(s): "The process cannot access the file 'H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\PROOF_CLIENT_ONLY_FREEZE_TRANSCRIPT_20260222_081845.txt' because it is being used by another process."
+PS C:\Users\Floyd> $zipSha = Sha256 $zip
+PS C:\Users\Floyd> $zipSide = $zip + ".sha256"
+PS C:\Users\Floyd> Set-Content -Encoding ASCII -NoNewline -Path $zipSide -Value ("$zipSha  " + (Split-Path -Leaf $zip) + "`n")
+PS C:\Users\Floyd> "ZIP_FILE=$zip"
+ZIP_FILE=H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only\out\SG_ENTERPRISE_CLIENT_ONLY_v0.1_FROZEN_20260222_081845.zip
+PS C:\Users\Floyd> "ZIP_SHA256=$zipSha"
+ZIP_SHA256=bc1f1a969d59772baedcdbda03d7a1b0b0c027ac8784549a073af14f7e884cb1
+PS C:\Users\Floyd> # ---- close transcript + hash it ----
+PS C:\Users\Floyd> Stop-Transcript | Out-Null
+**********************
+PowerShell transcript end
+End time: 20260222101846
+**********************

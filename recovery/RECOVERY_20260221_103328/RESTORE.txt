@@ -1,0 +1,14 @@
+RESTORE (git history):
+  mkdir H:\restore_test
+  cd H:\restore_test
+  git clone H:\secrets-guard\recovery\RECOVERY_20260221_103328\repo_20260221_103328.bundle repo
+  cd repo
+  git checkout 5f4a894d78dc0252889f1bacd46cdef45e246392
+
+RESTORE (worktree snapshot on top, if needed):
+  Expand-Archive -Path H:\secrets-guard\recovery\RECOVERY_20260221_103328\worktree_20260221_103328.zip -DestinationPath (Get-Location).Path -Force
+
+ANCHORS:
+  HEAD=5f4a894d78dc0252889f1bacd46cdef45e246392
+  bundle_sha256=4fa45dc115fe6a7465fa8e0d69ba05ac0e8fe5261ad12f0ec7b3fb539573fdeb
+  worktree_zip_sha256=

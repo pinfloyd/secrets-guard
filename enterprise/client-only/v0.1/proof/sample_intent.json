@@ -1,0 +1,1 @@
+{"intent":{"action_type":"GIT_COMMIT_DIFF","payload":{"commit":"0000000000000000000000000000000000000000","diff_facts":[{"line":1,"added":"OPENAI_SECRET_KEY=abc","path":"README.md"}],"ref":"refs/heads/main","repo":"sg-client-only-smoke"}}}

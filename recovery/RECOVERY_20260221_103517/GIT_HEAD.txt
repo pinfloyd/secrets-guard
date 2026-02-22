@@ -1,0 +1,4 @@
+HEAD=5f4a894d78dc0252889f1bacd46cdef45e246392
+BRANCH=debug-diff
+ROOT=H:\secrets-guard
+

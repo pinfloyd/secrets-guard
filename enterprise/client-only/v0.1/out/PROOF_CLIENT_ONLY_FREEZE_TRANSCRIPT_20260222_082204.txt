@@ -1,0 +1,50 @@
+**********************
+PowerShell transcript start
+Start time: 20260222102204
+Username: DESKTOP-KEEAJSB\Floyd
+RunAs User: DESKTOP-KEEAJSB\Floyd
+Configuration Name: 
+Machine: DESKTOP-KEEAJSB (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll
+Process ID: 22172
+PSVersion: 7.5.4
+PSEdition: Core
+GitCommitId: 7.5.4
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS C:\Users\Floyd> "=== CLIENT-ONLY FREEZE CLEAN REBUILD v0.1 ==="
+=== CLIENT-ONLY FREEZE CLEAN REBUILD v0.1 ===
+PS C:\Users\Floyd> "UTC_NOW=" + (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+UTC_NOW=2026-02-22T08:22:04Z
+PS C:\Users\Floyd> "ROOT=" + $ROOT
+ROOT=H:\SG_ENTERPRISE_RUNTIME_v0.1\client-only
+PS C:\Users\Floyd> ""
+
+PS C:\Users\Floyd> "=== KEY HASHES (facts) ==="
+=== KEY HASHES (facts) ===
+PS C:\Users\Floyd> "VERIFY_EXE_SHA256=" + (Sha256 $verifyExe)
+VERIFY_EXE_SHA256=5a7eab12a1981668de44faf3c5fb5d4a171c18103dbd4680bf4c478e290a802b
+PS C:\Users\Floyd> "PUBKEY_JSON_SHA256=" + (Sha256 $pubkeyJson)
+PUBKEY_JSON_SHA256=09dc5b360c87431d44a4b75f7ad746bd6700bba953e8cce9368b8d0a0a4ca672
+PS C:\Users\Floyd> "SAMPLE_INTENT_SHA256=" + (Sha256 $intentJson)
+SAMPLE_INTENT_SHA256=473e761faa1a5941b706bfdc3f1b98d0d99a88aff276cb8a9d5553292bfddabb
+PS C:\Users\Floyd> "SAMPLE_RECORD_SHA256=" + (Sha256 $recordJson)
+SAMPLE_RECORD_SHA256=9a567a4449779254fdf34b080e04a4e0d327f4bd5985e58ce47320ededbd0952
+PS C:\Users\Floyd> "VERIFY_OUTPUT_SHA256=" + (Sha256 $verifyOut)
+VERIFY_OUTPUT_SHA256=cbe8cc41a262916093b489087be3e57cf9776c98fd2fc5b9de213e68f11a1bd4
+PS C:\Users\Floyd> ""
+
+PS C:\Users\Floyd> "=== VERIFY_OUTPUT_TAIL (facts) ==="
+=== VERIFY_OUTPUT_TAIL (facts) ===
+PS C:\Users\Floyd> Get-Content -Path $verifyOut -Tail 60
+VERIFICATION_OK
+PS C:\Users\Floyd> Stop-Transcript | Out-Null
+**********************
+PowerShell transcript end
+End time: 20260222102204
+**********************
