@@ -1,0 +1,7 @@
+Secrets-Guard Enterprise Deploy Kit v0.1 (VPS)
+
+Frozen pair:
+TAR: SG_ENTERPRISE_DEPLOYKIT_v0.1_FROZEN_20260222_093831.tar.gz
+TAR_SHA256: 
+
+This release anchors the VPS deploy kit for the pinned Authority image digest.
